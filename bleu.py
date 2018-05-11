@@ -135,7 +135,6 @@ def bleu(candidate, references, language):
     for i in range(1, 5):
         pr, bp = calculate_ngram(candidate, references, i, language)
         precisions.append(pr)
-    print("precisions: {}".format(precisions))
     return geometric_mean(precisions) * bp
 
 
