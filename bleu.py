@@ -140,9 +140,9 @@ def bleu(candidate, references, language):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="BLEU calculate")
-    parser.add_argument("-candidate", "--candidate", type=str)
-    parser.add_argument("-reference", "--reference", type=str)
-    parser.add_argument("-language", "--language", type=str)
+    parser.add_argument("candidate", help="candidate file", type=str)
+    parser.add_argument("reference", help="reference file or dir", type=str)
+    parser.add_argument("language", help="the language of evaluation, include en/ch", type=str)
     args = parser.parse_args()
     can_file = args.candidate
     ref_file = args.reference
