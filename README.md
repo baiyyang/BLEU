@@ -28,4 +28,5 @@ calculate Chinese BLEU:
 
 ## Reference
 [BLEU: a Method for Automatic Evaluation of Machine Translation](http://www.aclweb.org/anthology/P02-1040.pdf)
+[git:vikasnar/Bleu](https://github.com/vikasnar/Bleu)
 
