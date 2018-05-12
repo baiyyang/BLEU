@@ -10,12 +10,15 @@ Where _count(n-gram)_ is the number of occurrences of an n-gram in the candidate
 2. calculate the _pn_
 
 ![](https://github.com/baiyyang/BLEU/blob/master/image/pn.png)
+
 3. calculate the _bp_
 
 ![](https://github.com/baiyyang/BLEU/blob/master/image/bp.png)
+
 4. calculate _BLEU_
 
 ![](https://github.com/baiyyang/BLEU/blob/master/image/bleu.png)
+
 ## Usage
 
 ## Reference
