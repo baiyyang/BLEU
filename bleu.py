@@ -45,10 +45,8 @@ def read_data(candidate_filename, reference_file):
 def calculate_ngram(candidates, references, n, language):
     count_clip = 0
     count = 0
-    c_length = 0
-    r_length = 0
     for index, candidate in enumerate(candidates):
-        references_list, lengths = lines2dic(references, index, n, language)
+        references_list = lines2dic(references, index, n, language)
         if language == "en":
             words = candidate.split()
         else:
@@ -63,17 +61,27 @@ def calculate_ngram(candidates, references, n, language):
                 candidate_dic[key] = 1
         count_clip += clip(candidate_dic, references_list)
         count += limit
-        r_length += match_reference(len(words), lengths)
-        c_length += len(words)
     if count_clip == 0:
         pr = 0
     else:
         pr = float(count_clip) / count
-    if c_length > r_length:
+    return pr
+
+
+def brevity_penalty(candidates, references, language):
+    c = 0
+    r = 0
+    for index, candidate in enumerate(candidates):
+        c_length = len(candidate.split()) if language == "en" else len(candidate)
+        reference_index = [reference[index] for reference in references]
+        r_lengths = [len(r.split()) if language == "en" else len(r) for r in reference_index]
+        c += c_length
+        r += match_reference(c_length, r_lengths)
+    if c > r:
         bp = 1
     else:
-        bp = math.exp(1 - float(r_length) / c_length)
-    return pr, bp
+        bp = math.exp(1 - float(r) / c)
+    return bp
 
 
 def match_reference(candidate_len, reference_lens):
@@ -85,10 +93,10 @@ def match_reference(candidate_len, reference_lens):
     """
     best_len = abs(reference_lens[0] - candidate_len)
     best_ref = reference_lens[0]
-    for len in reference_lens:
-        if abs(len - candidate_len) < best_len:
-            best_len = abs(len - candidate_len)
-            best_ref = len
+    for length in reference_lens:
+        if abs(length - candidate_len) < best_len:
+            best_len = abs(length - candidate_len)
+            best_ref = length
     return best_ref
 
 
@@ -106,7 +114,6 @@ def clip(candidate, references):
 
 def lines2dic(references, index, n, language):
     reference_list = []
-    lengths = []
     for reference in references:
         reference_dic = {}
         line = reference[index]
@@ -114,7 +121,6 @@ def lines2dic(references, index, n, language):
             words = line.split()
         else:
             words = line
-        lengths.append(len(words))
         limit = len(words) - n + 1
         for i in range(limit):
             key = " ".join(words[i: i+n]).lower() if language == "en" else words[i: i+n]
@@ -123,7 +129,7 @@ def lines2dic(references, index, n, language):
             else:
                 reference_dic[key] = 1
         reference_list.append(reference_dic)
-    return reference_list, lengths
+    return reference_list
 
 
 def geometric_mean(precisions):
@@ -133,8 +139,9 @@ def geometric_mean(precisions):
 def bleu(candidate, references, language):
     precisions = []
     for i in range(1, 5):
-        pr, bp = calculate_ngram(candidate, references, i, language)
+        pr = calculate_ngram(candidate, references, i, language)
         precisions.append(pr)
+    bp = brevity_penalty(candidate, references, language)
     return geometric_mean(precisions) * bp
 
 
